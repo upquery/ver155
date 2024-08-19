@@ -1,0 +1,67 @@
+set scan off
+create or replace package gbl wrapped 
+a000000
+b2
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+9
+20f 103
+zc7L7wSBzTwGVH4R71+a1cmGH48wg2PM7cusZ3Sfiz578hVdl8PQwIdXIxq/xicGBhX4cit0
+f8zjFJ8nEz8keVshpKOs+HnhX+n7q3nJt3FwS4nARxbRqRHFdO8Yvg5u/LFdyq9ptwLKvIDQ
+g7lkDA3KDmtvA67dMfgnYCDbtlWYGYjX6rNpPJpgMfBd/hGEvi1HwfLy7OaANDWj11URRuP+
+kom1Pqo/5nnQFMxDK+Jd982eHVIdM4oeah0PEqxg
+
+/
+create or replace package body gbl wrapped 
+a000000
+b2
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+b
+c40 494
+x3B5N5AoAVQJPhy/dwhzKKn6vWkwg9crLm0FfC/NrZ3meDFwJYrma3fSDrS3okyTZfFuftxA
+JWOO8ihMg+v5zkp+MafTILcCYsNb7/rseA+ujCaTUsZhZzzlevFkT522yW+ZrIz4Ieg47NV4
+bBLobaTrxPr4XOz+gEVkXRIvRtsXSAnmIs8UBQ1USK+fgNNuMDQ1P4sDW3lT8X+DzcUyEdLJ
+Okg6SovtGS7vmR5K3FOihsPZzLj11PDW3kKIOIvundSpSs+KIfJDM1uN9rTAraibsvcS9w6o
+DMNoUbjmuzfoiJeziQ5Ta9u5Z0rTSDD9pLmRpoXT7pu9mOqUl7LfUZPc7yN53QTo0zJweWt3
+pFvEWGnE8FJrKcByRq/DNkoVEPsyHw0dg+mOo7DXvvA5No6ndYw1kd7uHDiqACLkz84IE8nS
+CAUf9dAMCs9peKNcGn51hWQDdWUmXS0VtCWwsMtm8Obz26+A2ZUxagELKzRQlCJCjtCPlXxd
+tjJpAcS69lxnMRHdBF+g8riYJwc9heLT39jzp4Vg41ab5JFXKRjqNOdapKG39Rr8vcZxj0cE
+U91ffuYuEDRugBvSfdLs0uqBniBQQZnq+op3qDS5r/BBnWz3KcO8AXOyUrcXu1oXIN10OHCn
+6BEMChpXSm6K2B5UKVyrxrJZxdG6JsVnPTc1Om7AKMc/gA/UrVZE85o0rrypOe/JLEGg/Mtr
+wQM9F5qOq2eHGomuk9B4Q35D9mgYYAJQrC04bCz8XaGjW7cHs3dsA85KuGRb9FpfAYVgnIuy
+gb11YfLyBECRpVbyWv7GLdSscPtMOWaBSigkBtKU5eVT1x+wY0142bFm8J7DXE3T6MF+0oox
+RJxUAH5ywrPMVsKydZFQyPfjKVTmTHFlwSB1oAxgrgOQO5yB56oQ106sdRkhZnBbx6N20tVQ
+zeaVMEyScx/12tmDDSG65LpgkDEqjSFPcx88S1xpavVZa02RslUFgtCTclqqFs8NG7NY6gx8
+vu2i0XRY7N6aJ2N5A5Vw5mgVkME46I3HI5Yqx/lEFcp37IT68gSaDhkaufMJHq4w5QE8J7wz
+R8Nb9DuztGYHWVaXPPt7kKzZedZzQum1JdXUAAmweG3PqlKMjlvRhfFt9PaNRUOjXSD5puxP
+hW8=
+
+/
+show error

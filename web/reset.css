@@ -1,0 +1,20 @@
+/* ---------- reset ----------- */
+html, body, div, span { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+object, iframe, h1, h2, h3 { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+h4, h5, h6, p { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+pre, a, abbr, address { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+cite, code, del, dfn, em { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+ins, kbd, q, img { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+samp, small, big, strong { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+sub, sup, tt, var, b { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+table, tr, i { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+td, th, tbody, thead, tfooter { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+dl, dt, dd, ol, ul { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+form, label, legend, li, fieldset { margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit;vertical-align: baseline; border-spacing: 0; }
+caption, article, aside, canvas, details { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+figcaption, footer, header, embed, figure { margin: 0; padding: 0; border: 0; font-size: 100%;  vertical-align: baseline; border-spacing: 0; }
+nav, output, ruby { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+section, summary, time, mark { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; border-spacing: 0; }
+* { -webkit-touch-callout: none; -webkit-text-size-adjust: none; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-transform-style: flat; }
+video, article, aside, details, figcaption { display: block; }
+figure, footer, header, menu, nav, section { display: block; }

@@ -1,0 +1,19 @@
+{
+  "short_name": "UPQUERY",
+  "name": "UPQUERY",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "Sistema da upquery",
+  "start_url": "dwu.upquery.main",
+  "icons": [{
+    "src": "dwu.fcl.download?arquivo=192x192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "dwu.fcl.download?arquivo=512x512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }],
+  "prefer_related_applications": false
+}

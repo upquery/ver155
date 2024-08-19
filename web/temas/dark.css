@@ -1,0 +1,33 @@
+*:root {
+
+  --azul-primario:         #1E1655; /* azul */
+  --verde-primario:        #3C8846; /* verde */
+  --cinza-primario:        #AAA39F; /* cinza */
+  --roxo-primario:         #191147; /* roxo */
+  --violeta-primario:      #6A3FBD; /* violeta */
+  --roxo-secundario:       #673F96; /* roxo2 */
+  --cinza-escuro-primario: #6B6254; /* cinza2 */
+  --bege-primario:         #F9F2ED; /* bege */
+  --branco-primario:       #F1F1F1; /* branco */
+  --cinza-claro-primario:  #DFD8D3; /* cinza3 */
+  --verde-claro-primario:  #8DB384; /* verde2 */
+
+  --rosa-secundario:       #F34BBA; /* rosa */
+  --azul-secundario:       #4B5DF3; /* azul2 */
+  --amarelo-secundario:    #F6C21A; /* amarelo */
+  --laranja-secundario:    #FF792E; /* laranja */
+  --vermelho-secundario:   #F2142B; /* vermelho */
+
+  --fonte-primaria:   'Source Sans Pro', Arial;
+  --fonte-secundaria: 'Montserrat', Tahoma;
+  --fonte-terciaria:  'Quicksand', Verdana;
+  --shadow:            0 0 10px 1px rgba(0,0,0,0.25);
+
+
+  --main-background:   #000000;
+  --button-background: var(--cinza-claro-primario);
+  --button-color:      #000;
+  --alert-background:  var(--cinza-escuro-primario);
+  --input-color:       var(--cinza-escuro-primario);
+  
+}

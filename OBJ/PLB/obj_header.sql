@@ -1,0 +1,36 @@
+create or replace package OBJ wrapped 
+a000000
+b2
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+9
+1b2c 412
+6bQkSkkwHnrPDwjxOnLkRvXe8xQwg82TACAFfC/N5eSeSCc3y+k8WRfxwjFpejcablNtOI7e
+2o76UDO16vFjhcDSNU4laxEqiDPam7kZmEny0amaFaNlcRCRWb4K1StMAunR6d5s2WM+MQX8
+bc8PqBqA1GFwOjmKKrZl1gkSyfI7mnhShuqkilONJaI5H32OW1/LGT1PC9a7SdYxmBNOnwGr
+r7uZS2pB1wdPO2tXq0I8Tm2ZEfHEVN2rNObHQriAVHf/FeXlvIVw1r6RLa+Qw+DWv4mQuxfW
+gF1RmyPS+V5zKGkQ9UBZ3pbW16gpasQOs7xACVrPvSkw9bFhlw1+laB2Vl0luvWqPfVWxUOu
+JyE/e/LqrFwwWBWZIYfFbcONCQLyPcVc4sOVCekMPWJcRcOBQJ4woqz2mZMyz1HVyBZnUfnj
+m+/l0BYiUTPjJe/FZMsPa5RngwD/MLoxqQXYL9hTZzMrJ6VU/d9VI/oZhN8swvjrSqdk3e9V
+pobQWPJeLBYW4Q64rmuQFVcCfp5yLY7HIeKSiKPsErCu6GGu/Pab4sCS2oBMq1qLJymvS2EB
+++F53dRhWhsrLmInkEFJzDaL3X9b77gU1iHGJc6vFa2erY0Cr/vSV3r6kYxKZk+j2HN8VC3o
+e0tNo8xrgU5FlyZ6InRlEUD2wvk4OiuFen49rpfnrVyTI86BTt6m/m/OzeSgbgNwFd3c/F8C
+4noSEy6ddry1MFo++bSdaB5bsdUP/CeSp0/5xr8if4W+ktzLTwxLPOWccMacKG1L1PSnOFVq
+Q6KaVD1TvBdUuInRirL1mzQC6kTR+g4MWET72oZxNtE0fbk3VTtI87S0fudLCNcvj+EdHeFo
+ObtF1FtP1dyraL6H58CcRvEz5H5qKuLsWckFblYwh9bbJUk13bbGEr3t3MZ3L8PqQKcMLOfL
+gbNd0ywA/C74ENGVRmskIs0kqtp6PxAEd/rVZXETLqR8DhSBakE2kvXTueuWY6QrJoWNWAAQ
+KmrK8E21HJhCTv1fdbRA
+
