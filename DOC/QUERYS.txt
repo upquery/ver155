@@ -1,0 +1,367 @@
+CREATE TABLE BI_AUTO_UPDATE (TIPO VARCHAR2(80), ULTIMO_UPDATE DATE, AUTO CHAR(1), status varchar2(20));
+
+CREATE TABLE bi_sessao ( cod varchar2(40), tipo varchar2(40), dt_acesso date, valor varchar2(800));
+
+CREATE TABLE BI_REPORT_LIST (ID NUMBER, EMAIL VARCHAR2(80), USUARIO VARCHAR2(80), ASSUNTO VARCHAR2(400), MSG CLOB, TELA VARCHAR2(400));
+
+CREATE TABLE BI_REPORT_SCHEDULE (ID NUMBER, REPORT_ID NUMBER, SEMANA VARCHAR2(120), MES VARCHAR2(120), HORA VARCHAR2(120), QUARTER VARCHAR2(40), ULTIMO_STATUS VARCHAR2(80), ULTIMA_DATA DATE);
+ALTER TABLE BI_REPORT_SCHEDULE ADD PRIMARY KEY (ID);
+
+CREATE TABLE BI_REPORT_FILTER (	ID NUMBER, MICRO_VISAO VARCHAR2(80), COLUNA VARCHAR2(80), CONDICAO VARCHAR2(80), VALOR VARCHAR2(400), NM_USUARIO VARCHAR2(80), REPORT_ID NUMBER );
+
+
+CREATE TABLE BI_TEMA ( CD_TEMA VARCHAR2(20 BYTE), NM_TEMA VARCHAR2(40 BYTE));
+
+create table bi_token ( code varchar2(200), usuario varchar2(40), dt_envio date, status varchar2(1), tela varchar2(40) );
+
+CREATE TABLE BI_CUSTOM_FAV ( CD_CUSTOM NUMBER, NM_USUARIO VARCHAR2(80 BYTE), DS_FAV VARCHAR2(100 BYTE), CD_MICRO_VISAO VARCHAR2(40 BYTE), CS_COLUNA VARCHAR2(40 BYTE), CS_AGRUPADOR VARCHAR2(40 BYTE), CS_COLUP VARCHAR2(40 BYTE), CS_RP VARCHAR2(40 BYTE), GRUPO VARCHAR2(40 BYTE), FILTRO VARCHAR2(4000 BYTE) );
+ALTER TABLE BI_CUSTOM_FAV MODIFY (DS_FAV NOT NULL ENABLE);
+ALTER TABLE BI_CUSTOM_FAV ADD PRIMARY KEY (CD_CUSTOM);
+
+CREATE TABLE BI_CUSTOM_PERMISSAO (	"NM_USUARIO" VARCHAR2(80 BYTE), "NM_VISAO" VARCHAR2(80 BYTE), "NM_COLUNA" VARCHAR2(80 BYTE), "CD_CUSTOM" NUMBER );
+ALTER TABLE BI_CUSTOM_PERMISSAO ADD PRIMARY KEY (CD_CUSTOM);
+
+CREATE TABLE bi_sessao ( cod varchar2(40), tipo varchar2(40), dt_acesso date, valor varchar2(800));
+
+CREATE TABLE BI_OBJECT_PADRAO_BKP (	TP_OBJETO VARCHAR2(400), CD_PROP VARCHAR2(60), CD_TIPO VARCHAR2(20), LABEL VARCHAR2(60), VL_DEFAULT VARCHAR2(60), SUFIXO VARCHAR2(10), SCRIPT VARCHAR2(40), VALIDACAO VARCHAR2(400), ST_PERSONALIZADO VARCHAR2(1), ORDEM NUMBER DEFAULT 1, GRUPO VARCHAR2(80), HINT VARCHAR2(1000));
+
+CREATE TABLE BI_CONSTANTES_BKP (CD_CONSTANTE VARCHAR2(40), VL_CONSTANTE VARCHAR2(400), VL_ORIGINAL VARCHAR2(400));
+
+create type arr is table of varchar2(200);
+
+
+------- PÓS UPDATE DE PACKAGES -------
+
+
+alter table micro_coluna add anotacao varchar2(3000);
+
+alter table goto_objeto add ordem number;
+
+alter table micro_visao add observacao varchar2(3000);
+
+alter table check_post add nm_remetente varchar2(80);
+
+alter table modelo_cabecalho add nm_modelo varchar2(80);
+update modelo_cabecalho set nm_modelo = nm_tabela;
+
+alter table filtros modify conteudo varchar2(200);
+alter table data_coluna modify permissao varchar2(800);
+
+UPDATE OBJETOS SET TP_OBJETO = 'COLUNAS' WHERE TP_OBJETO = 'BARRAS' AND CD_OBJETO NOT IN (SELECT CD_OBJECT FROM OBJECT_ATTRIB WHERE CD_PROP = 'TYPE' AND CD_OBJECT = CD_OBJETO AND PROPRIEDADE = 'Bar')
+
+alter table usuarios add password varchar2(200);
+
+grant create job to "UPMASTER";
+
+
+
+	procedure unicode_str(userpwd in varchar2, unistr out raw)
+	is
+		enc_str varchar2(124):='';
+		tot_len number;
+		curr_char char(1);
+		padd_len number;
+		ch char(1);
+		mod_len number;
+		debugp varchar2(256);
+	begin
+		tot_len:=length(userpwd);
+		for i in 1..tot_len loop
+			curr_char:=substr(userpwd,i,1);
+			enc_str:=enc_str||chr(0)||curr_char;
+		end loop;
+		mod_len:= mod((tot_len*2),8);
+		if (mod_len = 0) then
+			padd_len:= 0;
+		else
+			padd_len:=8 - mod_len;
+		end if;
+		for i in 1..padd_len loop
+			enc_str:=enc_str||chr(0);
+		end loop;
+		unistr:=utl_raw.cast_to_raw(enc_str);
+	end;
+	--
+	function crack (userpwd in raw) return varchar2 
+	is
+		enc_raw raw(2048);
+		--
+		raw_key2 raw(128);
+		pwd_hash raw(2048);
+		--
+		hexstr varchar2(2048);
+		len number;
+		password_hash varchar2(16);	
+	begin
+		dbms_obfuscation_toolkit.DESEncrypt(input => userpwd, 
+		       key => raw_key, encrypted_data => enc_raw );
+		hexstr:=rawtohex(enc_raw);
+		len:=length(hexstr);
+		raw_key2:=hextoraw(substr(hexstr,(len-16+1),16));
+		dbms_obfuscation_toolkit.DESEncrypt(input => userpwd, 
+		       key => raw_key2, encrypted_data => pwd_hash );
+		hexstr:=hextoraw(pwd_hash);
+		len:=length(hexstr);
+		password_hash:=substr(hexstr,(len-16+1),16);
+		return(password_hash);
+	end;
+begin
+	open c_user(upper(username));
+	fetch c_user into pwd_hash;
+	close c_user;
+	unicode_str(upper(username)||upper(password),raw_ip);
+	if( pwd_hash = crack(raw_ip)) then
+		return 'Y';
+	else
+		return 'N';
+	end if;
+end;
+
+
+create or replace procedure send_report( prm_to       varchar2 default null,
+                                         prm_cc       varchar2 default null,
+                                         prm_message  varchar2 default null, 
+                                         prm_subject  varchar2 default null,
+                                         prm_url       varchar2 default null, 
+                                         prm_mimic    varchar2 default null,
+                                         prm_usuario  varchar2 default 'DWU',
+                                         prm_password varchar2 default null,
+                                         prm_address  varchar2 default null,
+                                         prm_filename varchar2 default 'relatorio.pdf' ) as
+    ws_send varchar2(4000);
+begin
+
+    insert into err_txt values(to_char(sysdate, 'DD/MM/YYYY HH24:MI')||' - ENTRANDO NO SEND_REPORT');
+    commit;
+    
+    ws_send := '{ ';
+
+    --DESTINATÁRIO
+    ws_send := ws_send||'"to":[ "'||prm_to||'"], ';
+
+    --CÓPIA OCULTA
+    if nvl(prm_cc, 'N/A') <> 'N/A' then
+        ws_send := ws_send||'"toCc":[ "'||prm_cc||'"], ';
+    end if;
+
+    --CORPO DO EMAIL, MENSAGEM PRINCIPAL
+    ws_send := ws_send||'"message": "'||replace(replace(replace(replace(replace(prm_message, CHR(10), ''), CHR(13), ''), CHR(13)||CHR(10), ''), '\n', ''), '"', '\"')||'", ';
+
+    --ASSUNTO
+    ws_send := ws_send||'"subject": "'||prm_subject||'", ';
+
+    --ID DA TELA UTILIZADA
+    ws_send := ws_send||'"url": "http://'||prm_address||prm_url||'", ';
+
+    --USUÁRIO QUE VAI FAZER LOGIN, DEFAULT DWU
+    ws_send := ws_send||'"urlUser": "'||prm_usuario||'", ';
+
+    --SENHA DO USUÁRIO
+    ws_send := ws_send||'"urlPassword": "'||prm_password||'", ';
+
+    --NOME QUE VAI FICAR NO ANEXO
+    ws_send := ws_send||' "attachmentName": "'||prm_filename||'" ';
+
+    ws_send := ws_send||' }';
+
+    --USUÁRIO QUE VAI SER COPIADA A TELA
+    --gbl.setUsuario(prm_usuario, prm_mimic);
+    --fun.set_var('USUARIO', prm_mimic, prm_usuario);
+
+    --ENDEREÇO DA FERRAMENTA DE ENVIO, REPORT É O PRINT DA TELA
+    select XT_HTTP.doApiPost('http://backend.upquery.com/api/v1/report', '9193c7b5a2636edb8637927c787f4975', null, null, ws_send) into ws_send from dual;
+
+    --FEEDBACK
+    --htp.p(ws_send);
+    
+    insert into err_txt values(to_char(sysdate, 'DD/MM/YYYY HH24:MI')||' - ENVIOU O REPORT =>'||prm_url);
+    commit;
+
+
+
+    --GRANT PARA ACESSO A FERRAMENTA
+    /*    begin
+        dbms_java.grant_permission(
+           grantee           => 'DWU'                       -- username
+         , permission_type   => 'SYS:java.net.SocketPermission' -- connection permission
+         , permission_name   => 'backend.upquery.com:80'                     -- connection address and port
+         , permission_action => 'connect,resolve'               -- types
+        );
+
+        end;
+
+    */
+
+exception when others then
+    insert into err_txt values(DBMS_UTILITY.FORMAT_ERROR_STACK||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE||' mimic => '||prm_mimic||' usuario => '||prm_usuario);
+    commit;
+end send_report;
+
+
+create or replace procedure converteCorcoluna as
+
+    ws_conteudo varchar2(80);
+    ws_cor      varchar2(80); 
+    ws_coluna   varchar2(80);
+    ws_count    number := 0;
+
+begin
+
+    for i in(select cd_object from object_attrib where cd_prop = 'COR-COLUNA') loop
+    
+        select t1.propriedade, t2.propriedade into ws_conteudo, ws_cor from object_attrib t1 
+        left join
+        object_attrib t2 on t2.cd_prop = 'COR-COLUNA-HEX' and t2.cd_object = i.cd_object
+        where t1.cd_prop = 'COR-COLUNA' and t1.cd_object = i.cd_object;
+        
+        select cs_coluna into ws_coluna from ponto_avaliacao where cd_ponto = i.cd_object;
+        
+        select max(cd_destaque)+1 into ws_count from destaque;
+        
+        insert into destaque
+        values ('DWU', i.cd_object, ws_coluna, 'IGUAL', ws_conteudo, ws_cor, '', 'normal', '', ws_count);
+        commit;
+        
+    end loop;
+
+end converteCorcoluna;
+
+create or replace procedure remapGauge as
+    ws_tem number := 0;
+    ws_cor varchar2(200);
+    ws_valor varchar2(200);
+begin
+    for i in(select CD_OBJETO from objetos where TP_OBJETO = 'PONTEIRO') loop
+        SELECT listagg(propriedade, '|')  within group (order by cd_prop) into ws_cor from OBJECT_ATTRIB where cd_prop in('COR_ID_01_GOM', 'COR_ID_02_GOM', 'COR_ID_03_GOM', 'COR_ID_04_GOM') and CD_OBJECT = i.CD_OBJETO;
+        SELECT listagg(propriedade, '|')  within group (order by cd_prop) into ws_valor from OBJECT_ATTRIB where cd_prop in('VALOR_02_GOM','VALOR_03_GOM','VALOR_04_GOM','VALOR_05_GOM') and CD_OBJECT = i.CD_OBJETO;
+        begin
+            SELECT length(propriedade) into ws_tem from OBJECT_ATTRIB where cd_prop = 'CORES' and CD_OBJECT = i.CD_OBJETO;
+        exception when others then
+            ws_tem := 0;
+        end;
+        if ws_tem = 0 then
+            insert into object_attrib values('DWU', 'DEFAULT', 'DEFAULT', i.CD_OBJETO, 'VALORES', ws_valor);
+            insert into object_attrib values('DWU', 'DEFAULT', 'DEFAULT', i.CD_OBJETO, 'CORES', ws_cor);
+        end if;
+    end loop;
+end remapGauge;
+
+
+DECLARE
+BEGIN
+FOR I IN (SELECT CS_AGRUPADOR,CD_PONTO FROM PONTO_AVALIACAO WHERE CS_AGRUPADOR IS NOT NULL AND CD_PONTO IN(SELECT CD_OBJETO FROM OBJETOS WHERE TP_OBJETO NOT IN ('MAPA','PIZZA','PONTEIRO')))
+LOOP
+    UPDATE OBJECT_ATTRIB SET PROPRIEDADE = I.cs_agrupador||'|'||fun.getprop(I.CD_PONTO, 'SEC')
+    WHERE PROPRIEDADE = 'S' AND CD_PROP = 'HIDDEN';
+    COMMIT;
+END LOOP;
+END;
+
+
+declare 
+    prm_usuario varchar2(40) := 'UPQUERY.ANALISTA'; 
+    prm_password varchar2(40) := 'picnic1978';
+
+begin
+
+    update usuarios 
+    set password = ltrim(to_char(dbms_utility.get_hash_value(upper(trim(prm_usuario))||'/'||upper(trim(prm_password)), 1000000000, power(2,30) ), rpad( 'X',29,'X')||'X'))||ltrim( to_char(dbms_utility.get_hash_value(upper(trim(fun.ret_var('CLIENTE'))), 100000000, power(2,30) ), rpad( 'X',29,'X')||'X' ) )
+    where upper(trim(usu_nome)) = upper(trim(prm_usuario));
+end;
+
+   
+ -- COLETAR AS PROPRIEDADES DOS 'ICONE' QUE NÃO EXISTIA NA 'IMAGE' E INSERIR NA MESMA--  
+    DECLARE
+    
+        ws_validacao varchar2 (4000);
+        
+    BEGIN
+         
+        
+        FOR I IN (SELECT TP_OBJETO, CD_PROP,CD_TIPO,LABEL,VL_DEFAULT,SUFIXO,SCRIPT,VALIDACAO,ST_PERSONALIZADO,ORDEM,GRUPO,HINT FROM OBJECT_PADRAO WHERE TP_OBJETO = 'ICONE' AND CD_PROP NOT IN (SELECT CD_PROP FROM OBJECT_PADRAO WHERE TP_OBJETO = 'IMAGE'))
+        LOOP
+            ws_validacao:=i.validacao;
+            
+            INSERT INTO OBJECT_PADRAO VALUES ( 'IMAGE', I.CD_PROP,I.CD_TIPO,I.LABEL,I.VL_DEFAULT,I.SUFIXO,I.SCRIPT,WS_VALIDACAO,I.ST_PERSONALIZADO,I.ORDEM,I.GRUPO,I.HINT);
+            COMMIT;
+
+        END LOOP;
+    END;
+    
+    DELETE FROM OBJECT_PADRAO WHERE TP_OBJETO = 'ICONE';
+
+-------------------------------------------------------------------------------------------
+<<<<<MERGE FEITO DEVIDO A RECLAMAÇÃO DE CLIENTES E SUPORTE DO OBJETO ICONE NÃO TER ATRIBUTO DE COR DA BORDA, FOI DADO UM MERGE PARA QUE A BORDA FIQUE TRANSPARENTE ATÉ AS PRÓXIMAS ATUALIZAÇÕES, ONDE SERÁ UNIDO O OBJ ICONE E IMAGE EM UM SÓ>>>>
+
+
+MERGE INTO OBJECT_PADRAO T1
+USING (SELECT 1 FROM DUAL) T2
+ON( T1.CD_PROP = 'BORDA_COR' AND (T1.TP_OBJETO= 'ICONE' OR T1.TP_OBJETO = 'IMAGE' ))
+
+WHEN MATCHED THEN
+
+    UPDATE SET T1.VL_DEFAULT = 'transparent'
+    
+WHEN NOT MATCHED THEN
+
+    INSERT VALUES( 'ICONE','BORDA_COR','','Cor da borda','transparent','gr','','','', 9,'VISUAL','');
+
+    
+
+-- Novo atributo para definir o conteúdo do label do gráfico (colunas, barras, linhas e pizza)
+-------------------------------------------------------------------------------------------------------------------
+Insert into DWU.BI_OBJECT_PADRAO (TP_OBJETO,CD_PROP,CD_TIPO,LABEL,VL_DEFAULT,SUFIXO,SCRIPT,VALIDACAO,ST_PERSONALIZADO,ORDEM,GRUPO,HINT)         values ('PIZZA','LABEL_CONTEUDO','LOCAL','Conteúdo Label','D','gr','rtl','$opc|A|Ambos|C|Código|D|Descrição','N',21,'VISUAL',null);
+Insert into DWU.BI_OBJECT_PADRAO (TP_OBJETO,CD_PROP,CD_TIPO,LABEL,VL_DEFAULT,SUFIXO,SCRIPT,VALIDACAO,ST_PERSONALIZADO,ORDEM,GRUPO,HINT)         values ('BARRAS','LABEL_CONTEUDO','LOCAL','Conteúdo Label','D','gr','rtl','$opc|A|Ambos|C|Código|D|Descrição','N',11,'VISUAL',null);
+Insert into DWU.BI_OBJECT_PADRAO (TP_OBJETO,CD_PROP,CD_TIPO,LABEL,VL_DEFAULT,SUFIXO,SCRIPT,VALIDACAO,ST_PERSONALIZADO,ORDEM,GRUPO,HINT)         values ('COLUNAS','LABEL_CONTEUDO','LOCAL','Conteúdo Label','D','gr','rtl','$opc|A|Ambos|C|Código|D|Descrição','N',11,'VISUAL',null);
+Insert into DWU.BI_OBJECT_PADRAO (TP_OBJETO,CD_PROP,CD_TIPO,LABEL,VL_DEFAULT,SUFIXO,SCRIPT,VALIDACAO,ST_PERSONALIZADO,ORDEM,GRUPO,HINT)         values ('LINHAS','LABEL_CONTEUDO','LOCAL','Conteúdo Label','D','gr','rtl','$opc|A|Ambos|C|Código|D|Descrição','N',2,'VISUAL',null);
+commit;
+
+
+-- Criado novo atributo no objeto Valor para definir se o destaque deve ser aplicado no título no valor ou em ambos. Se o atributo não for informado o sistema vai continuar aplicando somente no título.
+-----------------------------------------------------------------------------------------------------------------------------------------
+Insert into DWU.BI_OBJECT_PADRAO (TP_OBJETO,CD_PROP,CD_TIPO,LABEL,VL_DEFAULT,SUFIXO,SCRIPT,VALIDACAO,ST_PERSONALIZADO,ORDEM,GRUPO,HINT) values ('VALOR','APLICA_DESTAQUE','LOCAL','Aplicar destaque','titulo','gr','rtl','$opc|titulo|Título|valor|Valor|ambos|Ambos','N','2','VISUAL','Aplicar o destaque somente no Título, valor ou Ambos.');
+
+
+
+-- Inserir log de atualização das cargas - (também fi criado na 1.5.5 para controle de execução dos Quarters) 
+--------------------------------------------------
+drop table VM_DETALHES; 
+--
+CREATE TABLE VM_DETALHES ( 
+ID             NUMBER, 
+BLOCO          VARCHAR2(100), 
+DT_HR_INICIO   DATE, 
+DT_HR_FIM      DATE, 
+MINUTOS        AS (ROUND((DT_HR_FIM - DT_HR_INICIO) * 1440,2)),
+PARAMETRO      VARCHAR2(500), 
+STATUS         VARCHAR2(100), 
+OBS            VARCHAR2(4000), 
+CD_SID         VARCHAR2(20), 
+CD_SERIAL      VARCHAR2(20) ) ; 
+--
+alter table micro_visao add dt_ultima_atualizacao date;
+create index idx_vm_detalhes_id on vm_detalhes (id); 
+create index idx_mivi_tabela on micro_visao (nm_tabela); 
+--
+
+
+
+-- Incluir Pescaria Brava no Mapa  
+--------------------------------------------------
+-- Pescaria Brava (inclusão)
+insert into bi_cidades_brasil values (4212650, 'Pescaria Brava', 'SC', 'Santa Catarina',null,1);
+update  bi_cidades_brasil set json = '[[[-48.9141910625,-28.4695335163],[-48.9159033090,-28.4585148768],[-48.9216878757,-28.4509962767],[-48.9241016343,-28.4361139664],[-48.9334065718,-28.4249170138],[-48.9358653341,-28.4222234069],[-48.9400992990,-28.4111293148],[-48.9340811405,-28.3967108803],[-48.9349918659,-28.3911029174],[-48.9384971654,-28.3833320469],[-48.9340485439,-28.3813889267],[-48.9375059918,-28.3725133221],[-48.9357090302,-28.3656471106],[-48.9486868870,-28.3599525312],[-48.9277153797,-28.3489189562],[-48.9164099013,-28.3542523958],[-48.9094170350,-28.3518106363],[-48.9056530478,-28.3586994898],[-48.8915312301,-28.3607600836],[-48.8912805300,-28.3606228661],[-48.8054931245,-28.3552708879],[-48.8094,-28.3606],[-48.8174,-28.3750],[-48.8318,-28.3862],[-48.8331,-28.3961],[-48.8220,-28.4167],[-48.8267,-28.4283],[-48.8421,-28.4294],[-48.8522,-28.4270],[-48.8604,-28.4333],[-48.8637,-28.4457],[-48.8721,-28.4481],[-48.8818,-28.4456],[-48.8905,-28.4690],[-48.8986,-28.4668],[-48.9141910625,-28.4695335163]]]'
+where nm_cidade = 'Pescaria Brava'; 
+
+-- Laguna (novas coordenadas retirando a área da Pescaria Brava)
+update  bi_cidades_brasil set json = '[[[-48.7063463912,-28.3408263994],[-48.7269972061,-28.3636603453],[-48.7405915546,-28.3863114854],[-48.7475172691,-28.4129086458],[-48.7461901821,-28.4200314952],[-48.7386451785,-28.4226981767],[-48.7482708237,-28.4287708319],[-48.7588734111,-28.4435028860],[-48.7671926060,-28.4750722523],[-48.7637205105,-28.4909614090],[-48.7607666783,-28.4947279238],[-48.7563756855,-28.4939667135],[-48.7464519553,-28.4947089623],[-48.7477055574,-28.5003053651],[-48.7420739101,-28.5029860196],[-48.7425199194,-28.5075880542],[-48.7474388332,-28.5071376969],[-48.7552843984,-28.5159740922],[-48.7581642941,-28.5229960230],[-48.7547324298,-28.5270958948],[-48.7571525588,-28.5376965869],[-48.7618106925,-28.5366542415],[-48.7814456271,-28.5516249253],[-48.7854935418,-28.5593178794],[-48.7813009984,-28.5640851494],[-48.7831852860,-28.5689890496],[-48.7908455458,-28.5679789584],[-48.8133537103,-28.5896171459],[-48.8143413936,-28.6002987648],[-48.8100358880,-28.6011157849],[-48.8092914788,-28.6050287551],[-48.8178950692,-28.6094370313],[-48.8260114022,-28.6070705505],[-48.8342940235,-28.6120922520],[-48.8425036099,-28.6110355469],[-48.8545895831,-28.6150074781],[-48.8597308876,-28.6075133712],[-48.8654721529,-28.6040480609],[-48.8744582899,-28.5946015638],[-48.9050082146,-28.6031334535],[-48.9307623467,-28.5940265781],[-48.9443298110,-28.5941652761],[-48.9343797226,-28.5796915897],[-48.9019496380,-28.5324894993],[-48.9035479422,-28.5289506507],[-48.9223888568,-28.5127412359],[-48.9117500200,-28.5120678562],[-48.9070029052,-28.5208111141],[-48.8949768031,-28.5242440473],[-48.8955035984,-28.5142457133],[-48.9078042470,-28.5105428830],[-48.9138950295,-28.4972921162],[-48.9251254499,-28.4931882956],[-48.9235504870,-28.4882370711],[-48.9141910625,-28.4695335163],[-48.8986,-28.4668],[-48.8905,-28.4690],[-48.8818,-28.4456],[-48.8721,-28.4481],[-48.8637,-28.4457],[-48.8604,-28.4333],[-48.8522,-28.4270],[-48.8421,-28.4294],[-48.8267,-28.4283],[-48.8220,-28.4167], [-48.8331,-28.3961],[-48.8318,-28.3862],[-48.8174,-28.3750],[-48.8094,-28.3606],[-48.8054931,-28.3552709],[-48.8054931245,-28.3552708879],[-48.7756686223,-28.3582658253],[-48.7631767498,-28.3562512148],[-48.7511950666,-28.3449962125],[-48.7553141412,-28.3244560290],[-48.7437166316,-28.3283347959],[-48.7063463912,-28.3408263994]]]'
+where nm_cidade = 'Laguna'; 
+commit; 
+
+
+----------------------------------------------------------------------------
+-- Log de usuários 
+------------------------------------------------------------------------------
+alter table usuarios add dt_ultima_validacao date;
+
+

@@ -1,0 +1,14 @@
+select
+XT_HTTP.doApiPost('http://report.upquery.com/api/v1/report', '9193c7b5a2636edb8637927c787f4975', null, null, '
+{
+	"to":[ "joao@upquery.com"],
+	"message": "<H1>Enviando Anexo</H1><h2>google.com</h2><h3>Gerado por report.upquery.com!</h3>",
+	"subject": "Anexo: google.com",
+	"url": "http://engeplus.com.br",
+	"attachmentName":"apostila.pdf"
+}
+')
+from dual;
+
+
+cid:ED8310F2-F554-4730-A784-1DB87F41DB77

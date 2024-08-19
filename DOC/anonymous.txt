@@ -1,0 +1,96 @@
+SELECT DBMS_XDB.CFG_GET().getClobVal() FROM DUAL;
+
+--obrigatório
+GRANT EXECUTE ON DBMS_EPG TO DWU;
+
+BEGIN
+  --remove o dad
+  execute  DBMS_EPG.drop_dad ( dad_name => 'DWU' );
+END;
+
+BEGIN
+  --cria o dad com a rota, obrigatório se n existir
+  execute DBMS_EPG.create_dad (dad_name => 'DWU', path => '/desenv/*');
+END;
+
+BEGIN
+  --se o dad n tiver rota, obrigatório
+  DBMS_EPG.map_dad (dad_name => 'DWU', path => '/*');
+END;
+
+BEGIN
+  --define o usuario principal, mesmo assim precisa de unlock no anonymous, obrigatório
+  execute DBMS_EPG.set_dad_attribute (dad_name   => 'geral',attr_name  => 'database-username', attr_value => 'UPMASTER');
+END;
+
+BEGIN
+  --define a tabela de arquivos, se não tiver obrigatório
+  execute DBMS_EPG.set_dad_attribute (dad_name   => 'DWU',attr_name  => 'document-table-name', attr_value => 'dwu.tab_documentos');
+END;
+
+BEGIN
+  --autoriza o uso com o usuário, obrigatorio
+  execute DBMS_EPG.AUTHORIZE_DAD (dad_name => 'geral', user => 'UPMASTER');
+end;
+
+BEGIN
+  execute DBMS_EPG.DEAUTHORIZE_DAD ('geral', 'UPMASTER');
+END;
+
+--obrigatório
+ALTER USER ANONYMOUS ACCOUNT UNLOCK;
+
+GRANT ALTER USER TO "UPMASTER";
+
+BEGIN
+  --tira rota do dad
+  DBMS_EPG.unmap_dad (dad_name => 'upquery',path     => '/*');
+END;
+
+BEGIN
+  --altera autenticacao
+  execute DBMS_EPG.set_dad_attribute ( dad_name   => 'DWU', attr_name  => 'authentication-mode', attr_value => 'Basic');
+END;
+
+BEGIN
+  --muda a pagina inicial
+  execute DBMS_EPG.set_dad_attribute (dad_name   => 'desenv', attr_name  => 'default-page', attr_value => 'dwu.upquery.main');
+END;
+
+BEGIN
+  EXECUTE DBMS_EPG.delete_dad_attribute (dad_name => 'geral', attr_name => 'database-username');
+END;
+
+BEGIN
+  EXECUTE DBMS_XDB.sethttpport(8080);
+END;
+
+
+
+---------------- OUTROS COMANDOS -----------------
+
+
+--GRANTS OU DBA
+grant execute on DWU.FCL to "UPMASTER";
+grant execute on DWU.UPQUERY to "UPMASTER";
+grant execute on DWU.FUN to "UPMASTER";
+grant execute on DWU.UPLOAD to "UPMASTER";
+grant execute on DWU.BRO to "UPMASTER";
+grant execute on DWU.IMP to "UPMASTER";
+grant execute on DWU.UP_REL to "UPMASTER";
+grant execute on DWU.SCH to "UPMASTER";
+grant execute on DWU.OBJ to "UPMASTER";
+grant execute on DWU.UPD to "UPMASTER";
+grant execute on DWU.GBL to "UPMASTER";
+grant execute on DWU.CORE to "UPMASTER";
+grant execute on DWU.AUX to "UPMASTER";
+grant execute on DWU.COM to "UPMASTER";
+grant ALL PRIVILEGES on dwu.TAB_DOCUMENTOS to "UPMASTER";
+
+grant create job to UPMASTER;
+GRANT EXECUTE on DBMS_JOB to UPMASTER;
+grant execute on dbms_scheduler to UPMASTER;
+grant select on sys.user$ to DWU;
+
+lsnrctl stop;
+lsnrctl start;
